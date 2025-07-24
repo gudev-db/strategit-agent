@@ -25,6 +25,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 # Configura o cliente OpenAI
 client = OpenAI(api_key=OPENAI_API_KEY)
 
+
 class AstraDBClient:
     def __init__(self):
         self.base_url = f"{ASTRA_DB_API_BASE}/api/json/v1/{NAMESPACE}"
@@ -99,6 +100,12 @@ st.set_page_config(
     page_title="Strategic AI Agent",
     page_icon="🚀"
 )
+
+# Configura o cliente OpenAI
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+# Inicializa o cliente AstraDB
+astra_client = AstraDBClient()
 
 # Inicializar Gemini
 gemini_api_key = os.getenv("GEM_API_KEY")
@@ -227,7 +234,7 @@ with tabs[0]:
                 if search_question.text:
                     embedding = get_embedding(search_question.text)
                     if embedding:
-                        rag_results = AstraDBClient.vector_search(COLLECTION_NAME, embedding)
+                        rag_results = astra_client.vector_search(COLLECTION_NAME, embedding)
                         rag_context = "\n".join([str(doc) for doc in rag_results])
                     else:
                         rag_context = "Não foi possível recuperar informações adicionais."
