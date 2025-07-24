@@ -2,6 +2,96 @@ import streamlit as st
 import os
 import google.generativeai as genai
 from datetime import datetime
+import os
+import requests
+import streamlit as st
+from dotenv import load_dotenv
+from openai import OpenAI  # Importação atualizada para a nova versão
+from typing import List, Dict
+
+# Carrega variáveis de ambiente
+load_dotenv()
+
+# Configurações
+EMBEDDING_MODEL = "text-embedding-3-small"
+CHAT_MODEL = "gpt-4o"  # Atualize para o modelo correto que você deseja usar
+COLLECTION_NAME = os.getenv("ASTRA_DB_COLLECTION")
+NAMESPACE = os.getenv("ASTRA_DB_NAMESPACE", "default_keyspace")
+EMBEDDING_DIMENSION = 1536
+ASTRA_DB_API_BASE = os.getenv("ASTRA_DB_API_ENDPOINT")
+ASTRA_DB_TOKEN = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# Configura o cliente OpenAI
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+class AstraDBClient:
+    def __init__(self):
+        self.base_url = f"{ASTRA_DB_API_BASE}/api/json/v1/{NAMESPACE}"
+        self.headers = {
+            "Content-Type": "application/json",
+            "x-cassandra-token": ASTRA_DB_TOKEN,
+            "Accept": "application/json"
+        }
+    
+    def vector_search(self, collection: str, vector: List[float], limit: int = 3) -> List[Dict]:
+        """Realiza busca por similaridade vetorial"""
+        url = f"{self.base_url}/{collection}"
+        payload = {
+            "find": {
+                "sort": {"$vector": vector},
+                "options": {"limit": limit}
+            }
+        }
+        try:
+            response = requests.post(url, json=payload, headers=self.headers, timeout=10)
+            response.raise_for_status()
+            return response.json()["data"]["documents"]
+        except Exception as e:
+            st.error(f"Erro na busca vetorial: {str(e)}")
+            st.error(f"Resposta da API: {response.text if 'response' in locals() else 'N/A'}")
+            return []
+
+def get_embedding(text: str) -> List[float]:
+    """Obtém embedding do texto usando OpenAI"""
+    try:
+        response = client.embeddings.create(
+            input=text,
+            model=EMBEDDING_MODEL
+        )
+        return response.data[0].embedding
+    except Exception as e:
+        st.error(f"Erro ao obter embedding: {str(e)}")
+        return []
+
+def generate_response(query: str, context: str) -> str:
+    """Gera resposta usando o modelo de chat da OpenAI"""
+    if not context:
+        return "Não encontrei informações relevantes para responder sua pergunta."
+    
+    prompt = f"""Responda baseado no contexto abaixo:
+    
+    Contexto:
+    {context}
+    
+    Pergunta: {query}
+    Resposta:"""
+    
+    try:
+        response = client.chat.completions.create(
+            model=CHAT_MODEL,
+            messages=[
+                {"role": "system", "content": '''
+                Você é um especialista em marketing digital. Com base na sua base de conhecimentos, 
+                ajude o usuário a encontrar a melhor estratégia para proceder.
+                '''},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Erro ao gerar resposta: {str(e)}"
 
 # Configuração inicial
 st.set_page_config(
@@ -104,6 +194,7 @@ with tabs[0]:
             st.warning("Preencha todos os campos obrigatórios")
         else:
             with st.spinner('Identificando o cerne do problema...'):
+                # Passo 1: Gerar a formulação inicial da tensão estratégica
                 prompt = f"""
                 Com base nestas informações:
                 
@@ -120,15 +211,60 @@ with tabs[0]:
                 
                 Saída em markdown com formatação clara.
                 """
-                response = modelo_texto.generate_content(prompt)
-
-                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
-                digital para recuperar mais informações relevantes''')
+                initial_response = modelo_texto.generate_content(prompt)
                 
-                st.session_state['strategic_tension'] = response.text
+                # Passo 2: Gerar pergunta para busca na base de dados
+                question_prompt = f'''
+                Baseado em {initial_response.text}, crie uma pergunta concisa para consultar 
+                uma base de dados de marketing digital e recuperar informações relevantes 
+                que possam ajudar a resolver esta tensão estratégica.
+                
+                A pergunta deve ser direta e focada nos aspectos-chave do problema.
+                '''
+                search_question = modelo_texto.generate_content(question_prompt)
+                
+                # Passo 3: Buscar informações relevantes (RAG)
+                if search_question.text:
+                    embedding = get_embedding(search_question.text)
+                    if embedding:
+                        rag_results = astra_client.vector_search(COLLECTION_NAME, embedding)
+                        rag_context = "\n".join([str(doc) for doc in rag_results])
+                    else:
+                        rag_context = "Não foi possível recuperar informações adicionais."
+                else:
+                    rag_context = "Não foi gerada uma pergunta para busca."
+                
+                # Passo 4: Aprimorar a resposta inicial com o contexto RAG
+                refinement_prompt = f'''
+                Aqui está a análise inicial da tensão estratégica:
+                {initial_response.text}
+                
+                E aqui estão informações relevantes recuperadas da base de conhecimento:
+                {rag_context}
+                
+                Com base nisso, aprimore a análise inicial:
+                1. Mantenha a estrutura original (tensão, explicação, perguntas)
+                2. Incorpore insights relevantes das informações recuperadas
+                3. Melhore a clareza e precisão onde aplicável
+                4. Adicione 1-2 exemplos concretos se relevantes
+                5. Mantenha a formatação em markdown
+                
+                Se as informações recuperadas não forem relevantes, mantenha a análise original.
+                '''
+                refined_response = modelo_texto.generate_content(refinement_prompt)
+                
+                # Armazenar e exibir resultados
+                st.session_state['strategic_tension'] = refined_response.text
+                st.session_state['rag_context'] = rag_context
+                
                 st.success("Tensão Estratégica Identificada:")
-                st.markdown(response.text)
-                st.markdown(question.text)
+                st.markdown(refined_response.text)
+                
+                # Opcional: mostrar informações recuperadas (pode ser colapsado)
+                with st.expander("Ver informações de apoio utilizadas"):
+                    st.markdown(f"**Pergunta de busca:** {search_question.text}")
+                    st.markdown("**Informações recuperadas:**")
+                    st.write(rag_context)
                 
                 # Botão para copiar
                 st.download_button(
