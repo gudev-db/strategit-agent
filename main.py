@@ -227,7 +227,7 @@ with tabs[0]:
                 if search_question.text:
                     embedding = get_embedding(search_question.text)
                     if embedding:
-                        rag_results = astra_client.vector_search(COLLECTION_NAME, embedding)
+                        rag_results = AstraDBClient.vector_search(COLLECTION_NAME, embedding)
                         rag_context = "\n".join([str(doc) for doc in rag_results])
                     else:
                         rag_context = "Não foi possível recuperar informações adicionais."
