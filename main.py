@@ -121,10 +121,14 @@ with tabs[0]:
                 Saída em markdown com formatação clara.
                 """
                 response = modelo_texto.generate_content(prompt)
+
+                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
                 
                 st.session_state['strategic_tension'] = response.text
                 st.success("Tensão Estratégica Identificada:")
                 st.markdown(response.text)
+                st.markdown(question.text)
                 
                 # Botão para copiar
                 st.download_button(
@@ -175,8 +179,11 @@ with tabs[1]:
                     Formato: markdown com seções claras.
                     """
                     response = modelo_texto.generate_content(prompt)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
                     st.session_state['secondary_research'] = response.text
                     st.markdown(response.text)
+                    st.markdown(question.text)
         
         elif analysis_type == "📊 Dados Quantitativos":
             st.file_uploader("Carregar Conjunto de Dados (CSV/Excel)", type=["csv", "xlsx"])
@@ -206,6 +213,9 @@ with tabs[1]:
                     response = modelo_texto.generate_content(prompt)
                     st.session_state['quantitative_analysis'] = response.text
                     st.markdown(response.text)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
         
         else:  # Entrevista Qualitativa
             interview_goals = st.text_area(
@@ -239,6 +249,10 @@ with tabs[1]:
                     response = modelo_texto.generate_content(prompt)
                     st.session_state['qualitative_guide'] = response.text
                     st.markdown(response.text)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
+                    
 
 # 3. Geração de Insights
 with tabs[2]:
@@ -291,6 +305,10 @@ with tabs[2]:
                 response = modelo_texto.generate_content(prompt)
                 st.session_state['strategic_insights'] = response.text
                 st.markdown(response.text, unsafe_allow_html=True)
+                
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
 
 # 4. Estratégias e Briefings
 with tabs[3]:
@@ -328,6 +346,9 @@ with tabs[3]:
                     response = modelo_texto.generate_content(prompt)
                     st.session_state['strategy_options'] = response.text
                     st.markdown(response.text)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
         
         with strategy_tab2:
             briefing_type = st.selectbox(
@@ -368,6 +389,9 @@ with tabs[3]:
                     response = modelo_texto.generate_content(prompt)
                     st.session_state[f'{briefing_type.lower().split()[0]}_brief'] = response.text
                     st.markdown(response.text)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
         
         with strategy_tab3:
             framework = st.selectbox(
@@ -408,6 +432,9 @@ with tabs[3]:
                     """
                     response = modelo_texto.generate_content(prompt)
                     st.markdown(response.text)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
 
 # 5. Estratégia de Marca
 with tabs[4]:
@@ -448,6 +475,9 @@ with tabs[4]:
                     """
                     response = modelo_texto.generate_content(prompt)
                     st.markdown(response.text)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
         
         with brand_tab2:
             if st.button("🪜 Construir Benefit Ladder"):
@@ -470,6 +500,9 @@ with tabs[4]:
                     """
                     response = modelo_texto.generate_content(prompt)
                     st.markdown(response.text)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
         
         with brand_tab3:
             if st.button("🔮 Definir Brand Prism"):
@@ -488,6 +521,9 @@ with tabs[4]:
                     """
                     response = modelo_texto.generate_content(prompt)
                     st.markdown(response.text)
+                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                    st.markdown(question.text)
 
 # 6. Comunicação e Canais
 with tabs[5]:
@@ -535,6 +571,9 @@ with tabs[5]:
             """
             response = modelo_texto.generate_content(prompt)
             st.markdown(response.text)
+            question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+            st.markdown(question.text)
 
 # 7. Métricas e KPIs
 with tabs[6]:
@@ -577,6 +616,9 @@ with tabs[6]:
                 """
                 response = modelo_texto.generate_content(prompt)
                 st.markdown(response.text)
+                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                st.markdown(question.text)
     
     with goal_tab2:
         st.info("ESOV = Share of Voice vs. Share of Market")
@@ -609,6 +651,9 @@ with tabs[6]:
                 """
                 response = modelo_texto.generate_content(prompt)
                 st.markdown(response.text)
+                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                st.markdown(question.text)
     
     with goal_tab3:
         st.info("Category Entry Points = Momentos de decisão")
@@ -638,6 +683,9 @@ with tabs[6]:
                 """
                 response = modelo_texto.generate_content(prompt)
                 st.markdown(response.text)
+                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                st.markdown(question.text)
 
 # 8. Estrutura de Time
 with tabs[7]:
@@ -681,6 +729,9 @@ with tabs[7]:
             """
             response = modelo_texto.generate_content(prompt)
             st.markdown(response.text)
+            question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+            st.markdown(question.text)
 
 # 9. Análises Estratégicas
 with tabs[8]:
@@ -726,6 +777,9 @@ with tabs[8]:
                 """
                 response = modelo_texto.generate_content(prompt)
                 st.markdown(response.text)
+                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                st.markdown(question.text)
     
     elif analysis_type == "PESTLE":
         industry = st.text_input("Setor/Indústria")
@@ -767,6 +821,9 @@ with tabs[8]:
                 """
                 response = modelo_texto.generate_content(prompt)
                 st.markdown(response.text)
+                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                st.markdown(question.text)
     
     else:
         market_trends = st.text_area("Tendências de Mercado", height=100)
@@ -800,6 +857,9 @@ with tabs[8]:
                 """
                 response = modelo_texto.generate_content(prompt)
                 st.markdown(response.text)
+                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                digital para recuperar mais informações relevantes''')
+                st.markdown(question.text)
 
 # Rodapé
 st.markdown("---")
