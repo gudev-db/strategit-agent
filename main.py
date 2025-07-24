@@ -306,9 +306,9 @@ with tabs[2]:
                 st.session_state['strategic_insights'] = response.text
                 st.markdown(response.text, unsafe_allow_html=True)
                 
-                    question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
+                question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
                 digital para recuperar mais informações relevantes''')
-                    st.markdown(question.text)
+                st.markdown(question.text)
 
 # 4. Estratégias e Briefings
 with tabs[3]:
