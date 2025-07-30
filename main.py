@@ -273,13 +273,7 @@ with tabs[0]:
                     st.markdown("**Informações recuperadas:**")
                     st.write(rag_context)
                 
-                # Botão para copiar
-                st.download_button(
-                    "📋 Copiar Formulação",
-                    data=response.text,
-                    file_name=f"tensao_estrategica_{datetime.now().strftime('%Y%m%d')}.md",
-                    mime="text/markdown"
-                )
+                
 
 # 2. Análise de Dados
 with tabs[1]:
