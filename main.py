@@ -110,7 +110,7 @@ astra_client = AstraDBClient()
 # Inicializar Gemini
 gemini_api_key = os.getenv("GEM_API_KEY")
 genai.configure(api_key=gemini_api_key)
-modelo_texto = genai.GenerativeModel("gemini-1.5-flash")
+modelo_texto = genai.GenerativeModel("gemini-2.0-flash")
 
 # CSS personalizado
 st.markdown("""
