@@ -157,6 +157,23 @@ st.markdown("""
         font-weight: bold;
         margin-right: 8px;
     }
+    .content-pillar {
+        background-color: #f0f8ff;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #4682b4;
+    }
+    .content-type-badge {
+        background-color: #e6e6fa;
+        color: #333;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        margin-right: 8px;
+        display: inline-block;
+        margin-bottom: 4px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -171,6 +188,7 @@ tabs = st.tabs([
     "📊 Análise de Dados",
     "💡 Geração de Insights",
     "🛠️ Estratégias e Briefings",
+    "📝 Estratégia de Conteúdo",  # Nova aba adicionada
     "🏷️ Estratégia de Marca",
     "📡 Comunicação e Canais",
     "📈 Métricas e KPIs",
@@ -272,8 +290,6 @@ with tabs[0]:
                     st.markdown(f"**Pergunta de busca:** {search_question.text}")
                     st.markdown("**Informações recuperadas:**")
                     st.write(rag_context)
-                
-                
 
 # 2. Análise de Dados
 with tabs[1]:
@@ -389,7 +405,6 @@ with tabs[1]:
                     question = modelo_texto.generate_content(f''''Baseado em {response}, crie uma pergunta a uma base de dados de marketing
                 digital para recuperar mais informações relevantes''')
                     st.markdown(question.text)
-                    
 
 # 3. Geração de Insights
 with tabs[2]:
@@ -573,8 +588,102 @@ with tabs[3]:
                 digital para recuperar mais informações relevantes''')
                     st.markdown(question.text)
 
-# 5. Estratégia de Marca
+# 5. Estratégia de Conteúdo (NOVA ABA)
 with tabs[4]:
+    st.header("📝 Estratégia de Conteúdo")
+    
+    st.markdown("""
+    <style>
+        .content-pillar {
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #4682b4;
+        }
+        .content-type-badge {
+            background-color: #e6e6fa;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 8px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        content_goal = st.selectbox(
+            "Objetivo Principal do Conteúdo*",
+            ["Educar", "Engajar", "Converter", "Fidelizar", "Humanizar a marca"]
+        )
+        content_audience = st.text_input(
+            "Público-Alvo Principal*",
+            placeholder="Ex: Mulheres 25-35, classe AB, interessadas em sustentabilidade..."
+        )
+    with col2:
+        content_channels = st.multiselect(
+            "Canais Prioritários*",
+            ["Website/Blog", "Redes Sociais", "E-mail", "Vídeo", "Podcast", "Eventos", "Publicações"],
+            default=["Website/Blog", "Redes Sociais"]
+        )
+        content_budget = st.select_slider(
+            "Orçamento para Conteúdo",
+            options=["Baixo", "Médio", "Alto"]
+        )
+    
+    if st.button("📊 Gerar Estratégia de Conteúdo"):
+        with st.spinner('Criando plano de conteúdo personalizado...'):
+            prompt = f"""
+            Crie uma estratégia de conteúdo completa para:
+            **Objetivo:** {content_goal}
+            **Público:** {content_audience}
+            **Canais:** {', '.join(content_channels)}
+            **Orçamento:** {content_budget}
+            
+            A estratégia deve incluir:
+            
+            ### 1. Pilares de Conteúdo (3-5 temas centrais)
+            Para cada pilar:
+            - Justificativa estratégica
+            - Ângulos de abordagem
+            - Exemplos concretos
+            
+            ### 2. Tipos de Conteúdo por Canal
+            - Formatos recomendados
+            - Frequência ideal
+            - Recursos necessários
+            
+            ### 3. Calendário Editorial
+            - Estrutura de temas mensais
+            - Datas relevantes
+            - Balanceamento de formatos
+            
+            ### 4. Fluxo de Conversão
+            - Como o conteúdo leva ao objetivo
+            - Chamadas para ação
+            - Integração entre canais
+            
+            Formato: markdown com formatação rica e exemplos.
+            """
+            response = modelo_texto.generate_content(prompt)
+            
+            # Armazenar e exibir resultados
+            st.session_state['content_strategy'] = response.text
+            
+            st.success("Estratégia de Conteúdo Gerada:")
+            st.markdown(response.text, unsafe_allow_html=True)
+            
+            # Adiciona análise de perguntas para base de dados
+            question = modelo_texto.generate_content(f'''Baseado em {response.text}, crie uma pergunta para consultar uma base de dados de marketing digital e recuperar informações relevantes sobre estratégias de conteúdo''')
+            st.markdown("**Pergunta para Base de Dados:**")
+            st.markdown(question.text)
+
+# 6. Estratégia de Marca
+with tabs[5]:
     st.header("🏷️ Estratégia de Marca")
     
     brand_name = st.text_input("Nome da Marca*")
@@ -662,8 +771,8 @@ with tabs[4]:
                 digital para recuperar mais informações relevantes''')
                     st.markdown(question.text)
 
-# 6. Comunicação e Canais
-with tabs[5]:
+# 7. Comunicação e Canais
+with tabs[6]:
     st.header("📡 Planejamento de Comunicação")
     
     campaign_goal = st.selectbox(
@@ -712,8 +821,8 @@ with tabs[5]:
                 digital para recuperar mais informações relevantes''')
             st.markdown(question.text)
 
-# 7. Métricas e KPIs
-with tabs[6]:
+# 8. Métricas e KPIs
+with tabs[7]:
     st.header("📈 Métricas e Performance")
     
     goal_tab1, goal_tab2, goal_tab3 = st.tabs([
@@ -824,8 +933,8 @@ with tabs[6]:
                 digital para recuperar mais informações relevantes''')
                 st.markdown(question.text)
 
-# 8. Estrutura de Time
-with tabs[7]:
+# 9. Estrutura de Time
+with tabs[8]:
     st.header("👥 Planejamento de Equipe")
     
     org_size = st.selectbox(
@@ -870,8 +979,8 @@ with tabs[7]:
                 digital para recuperar mais informações relevantes''')
             st.markdown(question.text)
 
-# 9. Análises Estratégicas
-with tabs[8]:
+# 10. Análises Estratégicas
+with tabs[9]:
     st.header("📊 Análises Estratégicas")
     
     analysis_type = st.radio(
